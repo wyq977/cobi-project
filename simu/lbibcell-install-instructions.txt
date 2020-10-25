@@ -1,0 +1,53 @@
+# LBIBCell Installation Instructions for Ubuntu 14.04 LTS (Trusty Tahr)
+# Valid for any Ubuntu 14.04.x Version (Ubuntu, Kubuntu, Ubuntu Gnome, ...)
+
+# Ubuntu 14.04 already contains gcc 4.8
+
+sudo apt-get install build-essential
+sudo apt-get install cmake-curses-gui
+sudo apt-get install doxygen
+sudo apt-get install paraview
+sudo apt-get install libboost-all-dev
+
+# VTK5.10.1 dependencies :
+
+
+sudo apt-get install libpng-dev
+sudo apt-get install libjpeg-dev
+sudo apt-get install libxxf86vm1
+sudo apt-get install libxxf86vm-dev
+sudo apt-get install libxi-dev
+sudo apt-get install libxrandr-dev
+sudo apt-get install mesa-common-dev
+sudo apt-get install mesa-utils-extra
+sudo apt-get install libgl1-mesa-dev
+sudo apt-get install libglapi-mesa
+
+
+
+# Now download VTK 5.10.1, extract and move it to /usr/local/
+
+cd VTK5.10.1
+sudo ccmake -Wno-dev .
+
+# Now enter c to configure, turn BUILD_SHARED_LIBS to 'ON' , then enter g to generate.
+
+sudo make -j n
+# For n enter 1.5x number of cores (or less), speeds up the process
+sudo make install
+
+sudo apt-get install git
+
+# Stable official LBIBCell version:
+git clone https://bitbucket.org/tanakas/lbibcell.git
+
+cd lbibcell
+sudo mkdir build
+cd build 
+sudo cmake -DCMAKE_BUILD_TYPE=Release ../
+sudo make -j 
+
+
+
+
+

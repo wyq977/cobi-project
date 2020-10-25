@@ -1,0 +1,4 @@
+-  gcc version 4.8.4 (> 4.7)
+-  boost 1.57.0 (< 1.58 !)
+-  cmake version 2.8.12.2 
+-  vtk 5.10.1
