@@ -77,14 +77,19 @@ def seg_lbibcell(filename, outdir, size_x, size_y, show=False):
     props = measure.regionprops_table(labeled_cells_threshold_multiotsu, img,
                                       properties=region_props)
 
+    # rescale
+    props['area'] = props['area'] / AREA_SCALE
+    props['centroid-0'] = props['centroid-0'] / SCALE_X
+    props['centroid-1'] = props['centroid-1'] / SCALE_Y
+
     image_label_overlay = color.label2rgb(
         labeled_cells_threshold_multiotsu, image=img, bg_label=0)
 
     print('{} cells identified from the image'.format(labeled_cells_threshold_multiotsu.max()))  # nopep8
-    print('Average area : {:.4f} +/- {:.2f}'.format(mean(props['area']) / AREA_SCALE, gstd(props['area']) / AREA_SCALE))  # nopep8
+    print('Average area : {:.4f} +/- {:.2f}'.format(mean(props['area']), gstd(props['area'])))  # nopep8
     print('CV           : {:.4f}'.format(variation(props['area'])))
-    print('min          : {:.4f}'.format(np.min(props['area']) / AREA_SCALE))
-    print('max          : {:.4f}'.format(np.max(props['area']) / AREA_SCALE))
+    print('min          : {:.4f}'.format(np.min(props['area'])))
+    print('max          : {:.4f}'.format(np.max(props['area'])))
 
     fig, axes = plt.subplots(2, 2, figsize=(4, 4))  # , constrained_layout=True
     ax = axes.ravel()
@@ -100,7 +105,7 @@ def seg_lbibcell(filename, outdir, size_x, size_y, show=False):
     ax[1].set_axis_off()
 
     ax[2].scatter(x=props['centroid-0'], y=props['centroid-1'],
-                  s=props['area'] / (img.shape[0] * 20))
+                  s=props['area'] / (size_x * 20))
     ax[2].set_title('Centroid of cells')
     ax[2].set_axis_off()
 

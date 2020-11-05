@@ -1,0 +1,9 @@
+name: vtk
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - vtk=9.0.1
+  - python=3.8
+  - ipykernel
+prefix: /usr/local/anaconda3/envs/vtk
