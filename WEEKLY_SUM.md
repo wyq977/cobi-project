@@ -2,6 +2,13 @@
 
 [Progress Board](https://trello.com/b/I7HLyuhK)
 
+## Week 3 - 11.02.2020 
+
+- Add Custom Shh solver based on tutorial 1, no parameters tuned yet
+- Add script to modify cell_type in vtp file by LBIBCell
+- Add script to fit C0 for exponential decay
+- taichi_lbibcell works with no CDESolver, boundary nodes detection and multiple cell support
+
 ## Week 2 - 26.10.2020 
 
 - Add different BioSolver for division at random size and remove cells too close to wall
