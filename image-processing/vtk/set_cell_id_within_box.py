@@ -13,6 +13,7 @@ import argparse
 import numpy as np
 from vtk import vtkXMLPolyDataReader, vtkXMLPolyDataWriter
 from vtk.util.numpy_support import vtk_to_numpy
+
 arg_log = """
 Example: python3 set_cell_id_within_box.py -i Cells_1000_0.vtp --id 2 --box 0 0 200 200 -o Cells_1000_0_cell_id_mod.vtp
 
@@ -31,14 +32,9 @@ Only tested on macos with vtk 9.0.1 installed from conda-forge
 """
 
 
-def is_cell_within_box(cell,
-                       MIN_X,
-                       MIN_Y,
-                       MAX_X,
-                       MAX_Y,
-                       debug=False,
-                       lattice_x=1005,
-                       lattice_y=1005):
+def is_cell_within_box(
+    cell, MIN_X, MIN_Y, MAX_X, MAX_Y, debug=False, lattice_x=1005, lattice_y=1005
+):
     """Take a cell (vtk Polygon) and see if it's within a box limit
 
     Parameters
@@ -73,49 +69,54 @@ def is_cell_within_box(cell,
     min_y = np.min(coor[:, 1])
     max_y = np.max(coor[:, 1])
 
-    is_within = (min_x > MIN_X and min_y > MIN_Y and max_x < MAX_X
-                 and max_y < MAX_Y)
+    is_within = min_x > MIN_X and min_y > MIN_Y and max_x < MAX_X and max_y < MAX_Y
 
     if debug:
-        print('x: [{:.2f} - {:.2f}]'.format(min_x, max_x))
-        print('y: [{:.2f} - {:.2f}]'.format(min_y, max_y))
-        if is_within: print('Cell is within the box limit')
-        else: print('!!! Cell is NOT within the box limit')
+        print("x: [{:.2f} - {:.2f}]".format(min_x, max_x))
+        print("y: [{:.2f} - {:.2f}]".format(min_y, max_y))
+        if is_within:
+            print("Cell is within the box limit")
+        else:
+            print("!!! Cell is NOT within the box limit")
         try:
             import matplotlib.pyplot as plt
             import matplotlib.patches as patches
+
             # Create figure and axes
             fig, ax = plt.subplots(1, figsize=[3, 3])
             ax.set_ylim(0, lattice_x)
             ax.set_xlim(0, lattice_y)
             ax.set_axis_off()
             # Create a Rectangle patch
-            cell = patches.Rectangle((min_x, min_y), (max_x - min_x),
-                                     (max_y - min_y),
-                                     linewidth=2,
-                                     edgecolor='r',
-                                     facecolor='none')
-            limit = patches.Rectangle((MIN_X, MIN_Y), (MAX_X - MIN_X),
-                                      (MAX_Y - MIN_Y),
-                                      linewidth=2,
-                                      edgecolor='b',
-                                      facecolor='none')
+            cell = patches.Rectangle(
+                (min_x, min_y),
+                (max_x - min_x),
+                (max_y - min_y),
+                linewidth=2,
+                edgecolor="r",
+                facecolor="none",
+            )
+            limit = patches.Rectangle(
+                (MIN_X, MIN_Y),
+                (MAX_X - MIN_X),
+                (MAX_Y - MIN_Y),
+                linewidth=2,
+                edgecolor="b",
+                facecolor="none",
+            )
             ax.add_patch(cell)
             ax.add_patch(limit)
             fig.show()
         except ImportError:
-            print('No ploting')
+            print("No ploting")
             pass
 
     return is_within
 
 
-def write_celltype_id(box,
-                      celltype_id,
-                      input_file,
-                      output_filename,
-                      lattice_x=1005,
-                      lattice_y=1005):
+def write_celltype_id(
+    box, celltype_id, input_file, output_filename, lattice_x=1005, lattice_y=1005
+):
     MIN_X, MIN_Y, MAX_X, MAX_Y = box
     reader = vtkXMLPolyDataReader()
     reader.SetFileName(input_file)
@@ -123,15 +124,16 @@ def write_celltype_id(box,
     polyData = reader.GetOutput()
     polyDataPointData = polyData.GetPointData()
     # change only this
-    cell_type = polyDataPointData.GetArray('cell_type')
+    cell_type = polyDataPointData.GetArray("cell_type")
 
     nbOfCells = polyData.GetNumberOfPolys()
     count = 0
 
     for i in range(nbOfCells):
         cell = polyData.GetCell(i)
-        if is_cell_within_box(cell, MIN_X, MIN_Y, MAX_X, MAX_Y, False,
-                              lattice_x, lattice_y):
+        if is_cell_within_box(
+            cell, MIN_X, MIN_Y, MAX_X, MAX_Y, False, lattice_x, lattice_y
+        ):
             # need to iter. thr. all Points of that polygon
             nbOfPoints = cell.GetNumberOfPoints()
             for i in range(nbOfPoints):
@@ -139,8 +141,8 @@ def write_celltype_id(box,
                 cell_type.SetValue(Id, celltype_id)
             count += 1
 
-    print('{} cells are within the box limit'.format(count))
-    print('Cell type id changed to {}'.format(celltype_id))
+    print("{} cells are within the box limit".format(count))
+    print("Cell type id changed to {}".format(celltype_id))
     writer = vtkXMLPolyDataWriter()
     writer.SetFileName(output_filename)
     writer.SetInputData(polyData)
@@ -148,42 +150,43 @@ def write_celltype_id(box,
     writer.Write()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # Set up the parsing of command-line arguments
     parser = argparse.ArgumentParser(
-        description=
-        "Write a initial round cell for LBIBCell simulation as well as the parameters",
+        description="Write a initial round cell for LBIBCell simulation as well as the parameters",
         epilog=arg_log,
-        formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("-i",
-                        "--input",
-                        type=str,
-                        help="Input file from LBIBCell")
-    parser.add_argument("--id",
-                        type=int,
-                        default=2,
-                        help="Celltype ID changed")
-    parser.add_argument("-x",
-                        "--SizeX",
-                        type=int,
-                        default=1000,
-                        help="The X-axis for the box grid, i.e. 1000")
-    parser.add_argument("-y",
-                        "--SizeY",
-                        type=int,
-                        default=1000,
-                        help="The Y-axis for the box grid, i.e. 1000")
-    parser.add_argument("--box",
-                        type=float,
-                        nargs="+",
-                        required=True,
-                        help="The box limit, i.e. MIN_X, MIN_Y, MAX_X, MAX_Y")
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument("-i", "--input", type=str, help="Input file from LBIBCell")
+    parser.add_argument("--id", type=int, default=2, help="Celltype ID changed")
+    parser.add_argument(
+        "-x",
+        "--SizeX",
+        type=int,
+        default=1000,
+        help="The X-axis for the box grid, i.e. 1000",
+    )
+    parser.add_argument(
+        "-y",
+        "--SizeY",
+        type=int,
+        default=1000,
+        help="The Y-axis for the box grid, i.e. 1000",
+    )
+    parser.add_argument(
+        "--box",
+        type=float,
+        nargs="+",
+        required=True,
+        help="The box limit, i.e. MIN_X, MIN_Y, MAX_X, MAX_Y",
+    )
     parser.add_argument(
         "-o",
         "--output_file",
         type=str,
-        help="Ouput filename, i.e. Cells_4000_0_cell_id_mod.vtp")
+        help="Ouput filename, i.e. Cells_4000_0_cell_id_mod.vtp",
+    )
     args = parser.parse_args()
 
     filename = args.input
@@ -198,18 +201,17 @@ if __name__ == '__main__':
         output_file = "{}_cell_id_mod.vtp".format(filename_no_ext)
 
     # be sure not to remove previous file and check input valid
-    if not os.path.exists(filename) or ext != '.vtp':
+    if not os.path.exists(filename) or ext != ".vtp":
         print(
-            '{} not valid, should be a vtp file, i.e. Cells_4000_0.vtp'.format(
-                filename))
+            "{} not valid, should be a vtp file, i.e. Cells_4000_0.vtp".format(filename)
+        )
         sys.exit(1)
     elif len(box) != 4 or box[0] > box[2] or box[1] > box[3]:
-        print('Input box dim not valid i.e. --box 1 25 100 150')
+        print("Input box dim not valid i.e. --box 1 25 100 150")
         sys.exit(1)
     elif os.path.exists(output_file):
         print("{} exist".format(output_file))
-        if input('Do you want to OVERWRITE {}? [y] '.format(
-                output_file)) != 'y':
+        if input("Do you want to OVERWRITE {}? [y] ".format(output_file)) != "y":
             sys.exit(1)
 
     write_celltype_id(box, id, filename, output_file, size_x, size_y)
