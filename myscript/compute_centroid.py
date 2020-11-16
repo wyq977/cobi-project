@@ -47,6 +47,6 @@ def center_centroid_celltype_id(celltype_id, input_file):
             count += 1
 
     print("{} cells are type: {}".format(count, celltype_id))
+    centroids = np.array([centroid_x, centroid_y], dtype=np.float32)
 
-
-center_centroid_celltype_id(1.0, "test_200_474cells.vtp")
+    return centroids

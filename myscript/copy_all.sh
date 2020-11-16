@@ -1,0 +1,20 @@
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_75_out shh_gradient_75_out
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_100_out shh_gradient_100_out
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_200_out shh_gradient_200_out
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_75_out_init_zero shh_gradient_75_out_init_zero
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_100_out_init_zero shh_gradient_100_out_init_zero
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_200_out_init_zero shh_gradient_200_out_init_zero
+
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_75_out_1 shh_gradient_75_out_1
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_100_out_1 shh_gradient_100_out_1
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_200_out_1 shh_gradient_200_out_1
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_75_out_init_zero_1 shh_gradient_75_out_init_zero_1
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_100_out_init_zero_1 shh_gradient_100_out_init_zero_1
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_200_out_init_zero_1 shh_gradient_200_out_init_zero_1
+
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_50_out_ss shh_gradient_50_out_ss
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_100_out_ss shh_gradient_100_out_ss
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_200_out_ss shh_gradient_200_out_ss
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_50_out_init_zero_ss shh_gradient_50_out_init_zero_ss
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_100_out_init_zero_ss shh_gradient_100_out_init_zero_ss
+./convert_mp4_from_euler.sh /cluster/scratch/wangyong/shh_gradient_200_out_inlsit_zero_ss shh_gradient_200_out_init_zero_ss

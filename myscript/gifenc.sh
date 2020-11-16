@@ -22,6 +22,6 @@ PALETTE="/tmp/ffmpeg2gifXXXXXX.png"
 FILTERS="fps=$FPS,scale=$X_RES:-1:flags=lanczos"
 
 ffmpeg -loglevel panic -i "$INPUT" -vf "$FILTERS,palettegen" -y "$PALETTE"
-ffmpeg -loglevel panic -i "$INPUT" -i $PALETTE -lavfi "$FILTERS [x]; [x][1:v] paletteuse" "$OUTPUT"
+ffmpeg -loglevel panic -i "$INPUT" -i $PALETTE -lavfi "$FILTERS [x]; [x][1:v] paletteuse" -y "$OUTPUT"
 
 rm -f "$PALETTE"
