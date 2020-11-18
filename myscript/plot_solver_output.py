@@ -59,7 +59,7 @@ def plot_solver_matrix(solver, vmin=None, vmax=None, figname=None):
     width = axes_size.AxesY(ax, aspect=1.0 / aspect)
     pad = axes_size.Fraction(pad_fraction, width)
     cax = divider.append_axes("right", size=width, pad=pad)
-    cbar = plt.colorbar(mappable, cax=cax)
+    cbar = plt.colorbar(img, cax=cax)
     cbar.set_label("Shh gradient (log)")
     plt.tight_layout()
     if figname:
