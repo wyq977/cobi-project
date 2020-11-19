@@ -114,6 +114,36 @@ def is_cell_within_box(
     return is_within
 
 
+def set_celltype_id_random(filename, celltype_id, percentage, output_filename):
+    reader = vtkXMLPolyDataReader()
+    reader.SetFileName(filename)
+    reader.Update()
+    polyData = reader.GetOutput()
+    polyDataPointData = polyData.GetPointData()
+    # change only this
+    cell_type = polyDataPointData.GetArray("cell_type")
+
+    nbOfCells = polyData.GetNumberOfPolys()
+
+    choose_idx = np.random.choice(
+        nbOfCells, size=int(nbOfCells * percentage), replace=False
+    )
+
+    for i in choose_idx:
+        cell = polyData.GetCell(i)
+        # need to iter. thr. all Points of that polygon
+        nbOfPoints = cell.GetNumberOfPoints()
+        for i in range(nbOfPoints):
+            Id = cell.GetPointIds().GetId(i)
+            cell_type.SetValue(Id, celltype_id)
+
+    writer = vtkXMLPolyDataWriter()
+    writer.SetFileName(output_filename)
+    writer.SetInputData(polyData)
+    writer.SetDataModeToAscii()
+    writer.Write()
+
+
 def write_celltype_id(
     box, celltype_id, input_file, output_filename, lattice_x=1005, lattice_y=1005
 ):
