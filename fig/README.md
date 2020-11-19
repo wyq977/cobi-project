@@ -24,6 +24,8 @@ Later in calculation, sources are defined as distance to the center of the clust
 * Shh decay elsewhere: 1e-3 * Shh concentration (exponentially)
 
 
+**Boundary condition**: `MassSolverBoxOutlet`, walls at x=0 and y=0
+
 Solver output are recorded every 10 iteration for 500 iteration
 
 Figure with `init_zero`: During init., concentration of the shh was set to zero, otherwise, cell of type 2 are init. with concentration 1.0
@@ -37,6 +39,8 @@ Figure with `init_zero`: During init., concentration of the shh was set to zero,
 * Shh production from type 2 cell: 1e-4
 * Shh uptake/turnover on cell (type 1,2): 5e-3 * Shh concentration (exponentially)
 * Shh decay elsewhere: 1e-3 * Shh concentration (exponentially)
+
+**Boundary condition**: `MassSolverBoxOutlet`, walls at x=0 and y=0
 
 Solver output are recorded every 10 iteration for 500 iteration
 
