@@ -79,4 +79,3 @@ if __name__ == "__main__":
         print("Drawing error")
         traceback.print_exc()
         sys.exit(1)
-
