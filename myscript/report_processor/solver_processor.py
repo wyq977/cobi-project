@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable, axes_size
 from .settings import *
+from .video import png_to_gif
+
 
 if get_os_name() == "linux":
     plt.switch_backend("Agg")
@@ -170,7 +172,7 @@ class SolverProcessor:
             f_out.close()
 
             np.save(npy, mat)
-            print(f'\rtxt saved as "{filename}".npy...', end="")
+            print(f"\rtxt saved as {filename}.npy...", end="")
 
         self.vmax += SHIFT
         self.vmin += SHIFT
@@ -201,3 +203,12 @@ class SolverProcessor:
             print(f"\rPlotting {figname}...", end="")
 
         print()
+
+    def png_to_gif(self, frame_rate=24, output_path="solver.gif"):
+        output_path = os.path.join(self.directory, output_path)
+        input_files = os.path.join(self.solver_directory, "Cells_*.png")
+        print(f"Making {output_path}...")
+        try:
+            png_to_gif(input_files, frame_rate, output_path)
+        except AssertionError:
+            pass
