@@ -1,11 +1,12 @@
+from genericpath import exists
 import os
-import warnings
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable, axes_size
-from .settings import *
+from myscript.core.settings import *
+from myscript.core.plot import get_inch_from_pts, myscript_tex_fonts
 from .video import png_to_gif
 
 
@@ -19,11 +20,7 @@ SHIFT = 1e-10
 
 
 def plot_solver_matrix(
-    filename,
-    shift,
-    vmin=None,
-    vmax=None,
-    figname=None,
+    filename, shift, vmin=None, vmax=None, figname=None, rcParams=None
 ):
     # TODO: fix LogNorm issue: now shifting by SHIFT to avoid issue with 0.0
     # TODO: ticks and label formatting for colobar
@@ -46,8 +43,11 @@ def plot_solver_matrix(
     cmap = "coolwarm"
     mappable = cm.ScalarMappable(norm=norm, cmap="coolwarm")
 
-    height = 5
+    # use latex font
+    height = get_inch_from_pts(345)
     width = height * width_to_height + 2
+    if rcParams:
+        mpl.rcParams.update(myscript_tex_fonts)
 
     fig = plt.figure(figsize=(width, height))
     ax = plt.gca()
@@ -56,6 +56,7 @@ def plot_solver_matrix(
     img = ax.imshow(mat.T, norm=norm, cmap=cmap, origin="lower")
     ax.set_xlabel("X (LBM unit)")
     ax.set_ylabel("Y (LBM unit)")
+    ax.grid(False)
     # create an axes on the right side of ax. The width of cax will be 5%
     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
     divider = make_axes_locatable(ax)
@@ -64,11 +65,61 @@ def plot_solver_matrix(
     cax = divider.append_axes("right", size=width, pad=pad)
     cbar = plt.colorbar(mappable, cax=cax)
     cbar.set_label("Shh gradient (LogNorm)")
-    plt.tight_layout()
+    # plt.tight_layout()
 
     if figname:
-        plt.savefig(figname, dpi=300, transparent=False)
+        plt.savefig(figname, dpi=300, transparent=False, bbox_inches="tight")
         plt.close(fig)
+
+
+def _get_np_from_txt(file, size_x, size_y):
+    mat = np.zeros((size_x, size_y), dtype=float)
+
+    try:
+        f_out = open(file, "r")
+    except IOError:
+        raise IOError(f'"{file}" does not exist or cannot be createed.')
+
+    for line in f_out.readlines():
+        line_list = line.rstrip("\n").split("\t")
+        x = int(line_list[0])
+        y = int(line_list[1])
+        c = float(line_list[5])
+        mat[x, y] = c
+
+    f_out.close()
+
+    return mat
+
+
+def _get_size(file):
+    last_line = readlast(file)
+    line_list = last_line.rstrip("\n").split("\t")
+
+    size_x = int(line_list[0]) + 1
+    size_y = int(line_list[1]) + 1
+
+    print("LB grid: {:d} X {:d}".format(size_x, size_y))
+
+    return size_x, size_y
+
+
+def get_solver_mat(file, flatten=False):
+    filename, _ = os.path.splitext(file)
+    npy = "{:s}.npy".format(filename)
+    if os.path.isfile(npy):
+        mat = np.load(npy)
+    else:
+        print("sdasd")
+        size_x, size_y = _get_size(file)
+        mat = _get_np_from_txt(file, size_x, size_y)
+        np.save(npy, mat)
+
+    if flatten:
+        # mean along y axis, average over x = [1, 1000]
+        return np.mean(mat, axis=0)
+
+    return mat
 
 
 class SolverProcessor:
@@ -89,7 +140,7 @@ class SolverProcessor:
             )
         n_txt = len(self.get_solver_txt())
         if n_txt > 30:
-            print("Dealing with {:d} files, please be patient :)")
+            print(f"Dealing with {n_txt} files, please be patient :)")
 
         self.solver_directory = os.path.join(self.directory, SOLVER_DIR)
         try:
@@ -132,16 +183,20 @@ class SolverProcessor:
         # TODO: add support for other cases of solver output like Cells_solver_100.txt
         # one should always have the first solver output
         cell_0_solver = os.path.join(self.directory, "Cells_0.txt")
-        last_line = readlast(cell_0_solver)
-        line_list = last_line.rstrip("\n").split("\t")
 
-        size_x = int(line_list[0]) + 1
-        size_y = int(line_list[1]) + 1
+        return _get_size(cell_0_solver)
 
-        print("LB grid: {:d} X {:d}".format(size_x, size_y))
-        print("txt saved to *.npy with np.ndarray ({:d}, {:d})".format(size_x, size_y))
-
-        return size_x, size_y
+    def get_solver_mat(self, file):
+        # TODO: get support for both case
+        full_file = os.path.join(self.directory, file)
+        filename, _ = os.path.splitext(file)
+        npy = os.path.join(self.directory, "{:s}.npy".format(filename))
+        if os.path.isfile(npy):
+            mat = np.load(npy)
+        else:
+            mat = self._get_np_from_txt(full_file, self.size_x, self.size_y)
+            np.save(npy, mat)
+        return mat
 
     def save_npy(self):
         # TODO: prevent repeat loading files while getting vmin, vmax

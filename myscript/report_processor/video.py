@@ -1,4 +1,4 @@
-from .settings import warning
+from myscript.core.settings import warning
 
 # from myproject.models import some_model
 import os
@@ -29,7 +29,7 @@ def png_to_gif(input_files, frame_rate=24, output_path="output.gif"):
             + "$(ls -1 {:s} | sort -V) ".format(input_files)
             + output_path
         )
-        print(command)
+        os.system(command)
     else:
         assert (
             'input_files should be list (of files) or str (of file template, like "%04d.png") instead of '
